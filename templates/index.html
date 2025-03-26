@@ -164,7 +164,7 @@
 </head>
 <body>
     <div class="logo">
-        <img id="logo" src="{{ url_for('static', filename='images/skt_logo.png') }}" alt="">
+        <img id="logo" src="{{ url_for('static', filename='images/skt_logo_beta.png') }}" alt="">
     </div>
     <div id="chat-container">
         <div class="chat-box" id="chat-box"></div>
@@ -195,7 +195,7 @@
             if (message === "") return;
 
             if (logo) {
-                logo.style.width = "150px"; // Shrinks logo after first message
+                logo.style.width = "200px"; // Shrinks logo after first message
             }
 
             chatBox.style.display = "flex";

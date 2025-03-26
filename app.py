@@ -1,6 +1,4 @@
 import random
-import nltk
-from nltk.stem import WordNetLemmatizer
 from fuzzywuzzy import fuzz
 
 from flask import Flask, render_template, request, jsonify
@@ -29,23 +27,15 @@ greetings = [
     "hey, how are you"
 ]
 
-nltk.download("wordnet")
-nltk.download("omw-1.4")
-
-lemmatizer = WordNetLemmatizer()
-
 
 def check_msg(msg):
     for greeting in greetings:
         if fuzz.partial_ratio(msg.lower(), greeting) > 70:
             return 1, None
 
-    words = msg.lower().split()
-    for word in words:
-        lemmatized_word = lemmatizer.lemmatize(word, pos='v')
 
-        for need in words_that_express_want_need_or_search:
-            if fuzz.partial_ratio(lemmatized_word, need) > 80:
+    for need in words_that_express_want_need_or_search:
+            if fuzz.partial_ratio(msg.lower(), need) > 90:
                 return 2, need
 
     return 0, None
