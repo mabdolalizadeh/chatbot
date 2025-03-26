@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/fav.ico') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='flaticon/flaticon-uicons/css/regular/all.css') }}">
+    <title>SKT Chatbot</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Light Mode */
+        body.light-mode {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: black;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #343541;
+            color: white;
+        }
+
+        .logo img {
+            width: 250px;
+            transition: width 0.5s ease;
+        }
+
+        #chat-container {
+            background: #2C2F38;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            width: 90%;
+            max-width: 600px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.5s ease;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 400px;
+            background: #333;
+            border-radius: 15px;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 10px;
+            max-width: 75%;
+            word-wrap: break-word;
+            transition: all 0.3s ease;
+        }
+
+        .user-message {
+            background: #0A84FF;
+            color: white;
+            align-self: flex-end;
+            border-radius: 25px 25px 0 25px;
+        }
+
+        .bot-message {
+            background: #4E4F58;
+            color: white;
+            align-self: flex-start;
+            border-radius: 25px 25px 25px 0;
+        }
+
+        #input-box {
+            display: flex;
+            padding: 15px;
+            gap: 15px;
+            align-items: center;
+            background: #40414F;
+            border-radius: 0 0 15px 15px;
+        }
+
+        input {
+            flex: 1;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 25px;
+            outline: none;
+            background: #555;
+            color: white;
+            font-size: 16px;
+            transition: background 0.3s ease;
+        }
+
+        input:focus {
+            background: #333;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            background: #0A84FF;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 20px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        /* 📱 Responsive Design */
+        @media (max-width: 768px) {
+            .logo img {
+                width: 200px;
+            }
+            #chat-container {
+                width: 95%;
+                max-width: 400px;
+            }
+            .chat-box {
+                max-height: 300px;
+            }
+            input {
+                font-size: 14px;
+            }
+            button {
+                font-size: 14px;
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo img {
+                width: 150px;
+            }
+            #chat-container {
+                max-width: 90%;
+            }
+            input {
+                font-size: 13px;
+            }
+            button {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">
+        <img id="logo" src="{{ url_for('static', filename='images/skt_logo.png') }}" alt="">
+    </div>
+    <div id="chat-container">
+        <div class="chat-box" id="chat-box"></div>
+        <div id="input-box">
+            <input type="text" id="user-input" placeholder="How can I help you?" onkeydown="handleKeyPress(event)">
+            <button onclick="sendMessage()"><i class="fi fi-rr-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // Detect and apply user's theme preference (light or dark mode)
+        function applyUserThemePreference() {
+            const userTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark-mode' : 'light-mode';
+            document.body.classList.add(userTheme);
+        }
+
+        // Apply the user's theme preference as soon as the page loads
+        window.onload = applyUserThemePreference;
+
+        function sendMessage() {
+            let logo = document.getElementById("logo");
+            const userInput = document.getElementById("user-input");
+            const chatBox = document.getElementById("chat-box");
+            const message = userInput.value.trim();
+            let chatContainer = document.getElementById("chat-container");
+            let inputBox = document.getElementById("input-box");
+
+            if (message === "") return;
+
+            if (logo) {
+                logo.style.width = "150px"; // Shrinks logo after first message
+            }
+
+            chatBox.style.display = "flex";
+
+            chatContainer.style.maxWidth = "90%";
+            chatContainer.style.height = "500px";
+            chatContainer.style.background = "#40414F";
+            chatContainer.style.borderRadius = "15px";
+            chatContainer.style.boxShadow = "0 5px 15px rgba(0,0,0,0.2)";
+
+            inputBox.style.borderTop = "1px solid #555";
+            inputBox.style.background = "#40414F";
+
+            // Append user message
+            const userMessage = document.createElement("div");
+            userMessage.classList.add("message", "user-message");
+            userMessage.textContent = message;
+            chatBox.appendChild(userMessage);
+
+            userInput.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Simulate bot "thinking" (first response)
+            const thinkingMessage = document.createElement("div");
+            thinkingMessage.classList.add("message", "bot-message");
+            thinkingMessage.textContent = "Thinking...";
+            chatBox.appendChild(thinkingMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Send message to Flask server
+            fetch("/chat", {
+                method: "POST",
+                body: JSON.stringify({ message: message }),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // After delay, update the thinking message with the actual bot response
+                setTimeout(() => {
+                    thinkingMessage.textContent = data.reply;
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 1000); // Adjust delay as needed (e.g., 1000ms = 1 second)
+            });
+
+            // Change placeholder after the first message
+            const placeholders = [
+                "Say something else...",
+                "Keep chatting!",
+                "Tell me more...",
+                "What’s next?",
+                "I’m listening..."
+            ];
+            let index = randomIndex(placeholders.length);
+            userInput.placeholder = placeholders[index];
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
+        function randomIndex(len) {
+            return Math.floor(Math.random() * len);
+        }
+    </script>
+</body>
+</html>
